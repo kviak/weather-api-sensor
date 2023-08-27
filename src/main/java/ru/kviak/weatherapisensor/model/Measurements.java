@@ -24,9 +24,6 @@ public class Measurements {
     @Column(name = "id")
     private UUID id;
 
-    @Column(name = "name", nullable = false)
-    private String name;
-
     @Column(name = "value", nullable = false)
     private BigDecimal value;
 
@@ -35,5 +32,5 @@ public class Measurements {
 
     @ManyToOne
     @JoinColumn(name = "sensor_id", referencedColumnName = "id")
-    private Sensor owner;
+    private Sensor sensor;
 }

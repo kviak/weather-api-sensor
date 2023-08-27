@@ -27,6 +27,6 @@ public class Sensor {
     @Column(name = "name", nullable = false)
     private String name;
 
-    @OneToMany(mappedBy = "owner")
+    @OneToMany(mappedBy = "sensor")
     private List<Measurements> items;
 }
