@@ -10,6 +10,7 @@ import ru.kviak.weatherapisensor.model.Measurements;
 import ru.kviak.weatherapisensor.model.Sensor;
 import ru.kviak.weatherapisensor.repository.MeasurementsRepository;
 import ru.kviak.weatherapisensor.repository.SensorRepository;
+import ru.kviak.weatherapisensor.util.error.SensorNotFound;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,7 +25,7 @@ public class MeasurementsService {
 
     @Transactional
     public MeasurementsDto add(MeasurementsDto dto){
-        Sensor owner = sensorRepository.findByName(dto.getSensor().getName());
+        Sensor owner = sensorRepository.findByName(dto.getSensor().getName()).orElseThrow(SensorNotFound::new);
         Measurements measurements = mapper.map(dto, Measurements.class);
         measurements.setSensor(owner);
         measurementsRepository.save(measurements);

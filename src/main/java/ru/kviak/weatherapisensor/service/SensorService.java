@@ -19,5 +19,4 @@ public class SensorService {
         sensorRepository.save(mapper.map(dto, Sensor.class));
         return dto;
     }
-
 }
