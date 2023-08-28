@@ -1,11 +1,13 @@
 package ru.kviak.weatherapisensor.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import ru.kviak.weatherapisensor.dto.MeasurementsDto;
-import ru.kviak.weatherapisensor.dto.RainyDaysCount;
+import ru.kviak.weatherapisensor.dto.RainyDaysCountDto;
 import ru.kviak.weatherapisensor.service.MeasurementsService;
 import ru.kviak.weatherapisensor.util.error.SensorErrorResponse;
 import ru.kviak.weatherapisensor.util.error.SensorNotFound;
@@ -19,8 +21,10 @@ import java.util.List;
 public class MeasurementsController {
     private final MeasurementsService measurementsService;
 
-    @PostMapping("/add")
-    public ResponseEntity<MeasurementsDto> handle(@RequestBody MeasurementsDto dto){
+    @PostMapping()
+    public ResponseEntity<?> handle(@RequestBody @Valid MeasurementsDto dto, BindingResult bindingResult){
+        if(bindingResult.hasErrors()){
+            return new ResponseEntity<>(bindingResult.getFieldError().getDefaultMessage(), HttpStatus.BAD_REQUEST);}
         return ResponseEntity.ok(measurementsService.add(dto));
     }
 
@@ -29,9 +33,8 @@ public class MeasurementsController {
         return ResponseEntity.ok(measurementsService.get());
     }
 
-
-    @GetMapping("/rayniDaysCount")
-    public ResponseEntity<RainyDaysCount> rainyDaysCount(){
+    @GetMapping("/rainy-days")
+    public ResponseEntity<RainyDaysCountDto> rainyDaysCount(){
         return ResponseEntity.ok(measurementsService.getRainyCount());
     }
 

@@ -5,9 +5,8 @@ import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.kviak.weatherapisensor.dto.MeasurementsDto;
-import ru.kviak.weatherapisensor.dto.RainyDaysCount;
+import ru.kviak.weatherapisensor.dto.RainyDaysCountDto;
 import ru.kviak.weatherapisensor.model.Measurements;
-import ru.kviak.weatherapisensor.model.Sensor;
 import ru.kviak.weatherapisensor.repository.MeasurementsRepository;
 import ru.kviak.weatherapisensor.repository.SensorRepository;
 import ru.kviak.weatherapisensor.util.error.SensorNotFound;
@@ -25,9 +24,9 @@ public class MeasurementsService {
 
     @Transactional
     public MeasurementsDto add(MeasurementsDto dto){
-        Sensor owner = sensorRepository.findByName(dto.getSensor().getName()).orElseThrow(SensorNotFound::new);
         Measurements measurements = mapper.map(dto, Measurements.class);
-        measurements.setSensor(owner);
+        measurements.setSensor(sensorRepository.findByName(dto.getSensor().getName())
+                .orElseThrow(SensorNotFound::new));
         measurementsRepository.save(measurements);
         return dto;
     }
@@ -35,14 +34,13 @@ public class MeasurementsService {
     @Transactional(readOnly = true)
     public List<MeasurementsDto> get(){
         List<MeasurementsDto> dtoList = new ArrayList<>();
-        for (Measurements m:measurementsRepository.findAll()) {
-            dtoList.add(mapper.map(m, MeasurementsDto.class)); // Change to StreamAPI
-        }
+        measurementsRepository.findAll().forEach((k) -> // Get all measurements, and mapping to dto class.
+                dtoList.add(mapper.map(k, MeasurementsDto.class)));
         return dtoList;
     }
 
     @Transactional(readOnly = true)
-    public RainyDaysCount getRainyCount(){
-        return new RainyDaysCount((measurementsRepository.getAllByRainingTrue().size()));
+    public RainyDaysCountDto getRainyCount(){
+        return new RainyDaysCountDto(measurementsRepository.countByRainingTrue());
     }
 }
